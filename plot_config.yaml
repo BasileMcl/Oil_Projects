@@ -1,0 +1,57 @@
+# Portfolio-wide plot styling. Every project loads this first, then its own
+# config.yaml's PLOT block overrides if needed. Single source of truth for
+# palette / fonts / figure sizes across all projects.
+
+PLOT:
+  LINEWIDTH: 1.5
+  ALPHA:     {PRIMARY: 0.85, SECONDARY: 0.75, SCATTER: 0.45, REGIME: 0.7, REF: 0.6}
+  SIZES:     {STANDARD: [13, 7], WIDE: [14, 6], SQUARE: [10, 6], DASHBOARD: [15, 10]}
+  SAVE:      {dpi: 150, bbox_inches: tight, facecolor: white}
+  XAXIS:     {FORMAT: "%b %Y", MONTHS: 2}
+  RCPARAMS:
+    figure.facecolor:  white
+    axes.facecolor:    white
+    axes.grid:         true
+    grid.alpha:        0.3
+    grid.linestyle:    "-"
+    grid.linewidth:    0.5
+    axes.spines.top:   false
+    axes.spines.right: false
+    font.size:         10
+    axes.titlesize:    12
+    axes.titleweight:  bold
+  COLORS:
+    # primary hex palette — reused across projects
+    PRICE:    "#1f4e79"
+    VOL:      "#c00000"
+    SCATTER:  "#1f4e79"
+    TREND:    "#c00000"
+    REF:      "#888888"
+    EVENT:    "#000000"
+    HIST:     "#e8601b"
+    CRACK:    "#e8601b"
+    MARGIN:   "#238b45"
+    STOCKS:   "#1f4e79"
+    SPR:      "#6a51a3"
+    FLOW:     "#2171b5"
+    FX:       "#6a51a3"
+    ZSCORE:   "#6a51a3"
+    M1_M2:    "#2171b5"
+    M1_M3:    "#e8601b"
+    M1_M6:    "#238b45"
+    M1_M12:   "#6a51a3"
+    CYCLE:    ["#1f4e79", "#e8601b", "#238b45", "#c00000", "#6a51a3"]
+    REGIMES:
+      # traffic-light gradient: green → yellow → orange → red
+      Normal:      "#2ca02c"
+      Tight:       "#f0c62e"
+      Stress:      "#ff7f0e"
+      Crisis:      "#c00000"
+      Unknown:     "#aaaaaa"
+      Stress-High: "#ff7f0e"
+      Crisis-High: "#c00000"
+      Stress-Low:  "#ff7f0e"
+      Crisis-Low:  "#c00000"
+  ZSCORE_LINES:
+    LEVELS:     [0, 2, 3, 4, -2, -3]
+    LINESTYLES: ["-", "--", ":", "-.", "--", ":"]

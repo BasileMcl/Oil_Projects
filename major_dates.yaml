@@ -1,0 +1,100 @@
+# Portfolio-wide event timeline. Two lists:
+#   events        — causal market shocks (what a reader sees on TV)
+#   observations  — derived statistical extremes from our own data
+#
+# Charts overlay only `events` by default to keep the picture readable.
+# Any notebook can explicitly request observations by passing
+# include_observations=True to the event-overlay helper.
+#
+# ──────────────────────────────────────────────────────────────────────────
+# SNAPSHOT: data + narrative current as of 2026-04-20.
+# Events more recent than ~2026-03 are *ongoing* — values flagged with
+# `provisional: true` are subject to revision.
+# ──────────────────────────────────────────────────────────────────────────
+
+events:
+  - date: "2020-04-20"
+    label: "COVID demand shock"
+    detail: "WTI expiring May-2020 contract settles at −$37 intraday. Global demand collapse."
+    affected: [Brent, WTI, LSGO]
+
+  - date: "2022-02-24"
+    label: "Russia invades Ukraine"
+    detail: "Start of European energy crisis. SPR drawdown programme follows."
+    affected: [Brent, LSGO, NWE_products]
+
+  - date: "2022-06-05"
+    label: "EU 6th sanctions package (Russian oil embargo)"
+    detail: "EU agrees 90%+ cut of Russian crude imports over 6-8 months. Partial Urals rerouting begins."
+    affected: [Brent, Urals, LSGO]
+
+  - date: "2022-12-05"
+    label: "G7 Russian crude price cap in force"
+    detail: "$60/bbl cap on Russian crude transported using Western services (insurance, shipping). Urals differential widens."
+    affected: [Brent, Urals]
+
+  - date: "2023-02-05"
+    label: "G7 Russian products price cap in force"
+    detail: "Product caps on Russian diesel ($100/bbl premium tier) and fuel oil ($45/bbl discount tier). Russian diesel flows reroute to Turkey, Brazil, ME."
+    affected: [LSGO, NWE_products]
+
+  - date: "2023-04-02"
+    label: "OPEC+ surprise cut"
+    detail: "Brent jumps ~6% in one session after surprise voluntary-cuts announcement."
+    affected: [Brent, WTI]
+
+  - date: "2026-02-28"
+    label: "Iran hostilities begin"
+    detail: "Hostilities in the Strait of Hormuz corridor. Starts the 2026 geopolitical premium cycle."
+    affected: [Brent, LSGO, NWE_products]
+    provisional: true
+
+  - date: "2026-03-02"
+    label: "Hormuz closure"
+    detail: "Shipping suspended through the Strait of Hormuz."
+    affected: [Brent, LSGO, NWE_products]
+    provisional: true
+
+  - date: "2026-04-07"
+    label: "Dated-M1 Brent dislocation"
+    detail: "Platts Dated Brent assessed above front-month futures by an unusual margin during the Hormuz-ceasefire/opening window. Exact number under review — verify against the short (69-day) Jan-Apr 2026 Dated file before quoting."
+    affected: [Brent]
+    provisional: true
+    verify: "Dated vs M1 gap on 2026-04-07 — number caveat in TL;DR if uncertain"
+
+observations:
+  # These are not "news events" — they are extremes our analysis identified.
+  # Overlay only when diagnostic context is needed.
+
+  - date: "2022-03-08"
+    label: "Brent $127 post-invasion peak"
+    detail: "Post-invasion Brent spot peak; 3-2-1 crack peaks around this window."
+
+  - date: "2022-06-06"
+    label: "NWE 3-2-1 crack peak (~105 USD/bbl)"
+    detail: "Refinery-margin blowout post-invasion."
+
+  - date: "2025-06-19"
+    label: "LSGO M1-M3 Z-peak"
+    detail: "5.25σ in rolling-Z mode; peak recalibrated under IS-anchored Z."
+
+  - date: "2025-07-09"
+    label: "LSGO M1-M6 spread peak"
+    detail: "85.25 USD/MT."
+
+  - date: "2026-03-06"
+    label: "Brent IS-anchored Z-peak"
+    detail: "Highest Brent M1-M3 Z against pre-2025 distribution."
+
+  - date: "2026-03-19"
+    label: "Brent-WTI spread peak"
+    detail: "+8.23 USD/bbl on the ICE rolling series. (Widely reported $25 figure seen in media does not reconcile with our rolling-contract data.)"
+
+  - date: "2026-04-02"
+    label: "Brent M1-M3 and LSGO M1-M3 records"
+    detail: "Brent M1-M3 17.60 USD/bbl; LSGO M1-M3 293.75 USD/MT."
+
+  - date: "2026-04-17"
+    label: "Realised vol peaks"
+    detail: "LSGO 115%, Brent 89% (20-day annualised) as of the data cutoff."
+    provisional: true

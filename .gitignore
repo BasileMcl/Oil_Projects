@@ -1,0 +1,17 @@
+Datas/
+Reference_Notes/
+LinkedIn_Post/
+_archive/
+_chartbook/Oil_Portfolio_Chartbook_*_overleaf/
+_chartbook/Oil_Portfolio_Chartbook_*_overleaf.zip
+**/outputs/figures/
+__pycache__/
+*.py[cod]
+*.egg-info/
+.ipynb_checkpoints/
+*.ipynb_checkpoints
+.DS_Store
+.vscode/
+.idea/
+.claude/
+*.swp
