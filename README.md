@@ -18,7 +18,7 @@ The NWE ULSD-Brent crack hedge ratio is **regime-dependent, not constant**:
 
 In Normal, the crack floats independent of crude. In Crisis-2026 (the active Hormuz regime), it moves *with* Brent — diesel-specific Hormuz pass-through, not a generic crisis pattern. **A static pooled β ≈ 0.4 under-hedges Brent risk by ~50% on the Crisis-2026 mean, and by 2×+ at the latest print (+1.17 single-day on 2026-04-17).**
 
-Pipeline: [Forward_Curves_Analysis/scripts/run_matched_beta.py](Forward_Curves_Analysis/scripts/run_matched_beta.py). Calendar pairing wired via [Forward_Curves_Analysis/src/futures_calendar.py](Forward_Curves_Analysis/src/futures_calendar.py). Full methodology in [CRACK_METHODOLOGY.md](CRACK_METHODOLOGY.md). Chartbook §5 is the desk-language version of this finding.
+Pipeline: [forward_curves_analysis/scripts/run_matched_beta.py](forward_curves_analysis/scripts/run_matched_beta.py). Calendar pairing wired via [forward_curves_analysis/src/futures_calendar.py](forward_curves_analysis/src/futures_calendar.py). Full methodology in [CRACK_METHODOLOGY.md](CRACK_METHODOLOGY.md). Chartbook §5 is the desk-language version of this finding.
 
 ---
 
@@ -26,7 +26,7 @@ Pipeline: [Forward_Curves_Analysis/scripts/run_matched_beta.py](Forward_Curves_A
 
 | Entry | Format | Best for |
 |---|---|---|
-| **Chartbook** ([source](_chartbook/Oil_Portfolio_Chartbook_2026-04-24.tex), [Overleaf zip](_chartbook/Oil_Portfolio_Chartbook_2026-04-24_overleaf.zip)) | 23-page LaTeX deck | Forwardable to a desk. Pages 7-8 are the regime-β finding above. Compile with `pdflatex` or upload the zip to Overleaf. |
+| **Chartbook** ([source](chartbook/Oil_Portfolio_Chartbook_2026-04-24.tex), [Overleaf zip](chartbook/Oil_Portfolio_Chartbook_2026-04-24_overleaf.zip)) | 23-page LaTeX deck | Forwardable to a desk. Pages 7-8 are the regime-β finding above. Compile with `pdflatex` or upload the zip to Overleaf. |
 | **Project notebooks** | Jupyter + executed HTML | Methodology + code. Each project runs end-to-end via `bash generate_reports.sh`. |
 | **[PORTFOLIO_SUMMARY.md](PORTFOLIO_SUMMARY.md)** | 2-page markdown | Cross-project synthesis — the single read tying all three together. |
 
@@ -36,32 +36,33 @@ Pipeline: [Forward_Curves_Analysis/scripts/run_matched_beta.py](Forward_Curves_A
 
 | # | Project | Scope |
 |---|---|---|
-| 1 | [Forward_Curves_Analysis](Forward_Curves_Analysis/) | ICE Brent / LSGO / WTI M1–M12 daily settlements · CDF + HMM regime classification · regime-conditional rolling β · basin spread · 36-year OPEC ASB long-history context |
-| 2 | [Spot_Cracks_Analysis](Spot_Cracks_Analysis/) | NWE / Med 3-2-1, ULSD, EBOB cracks · US 43-year refinery utilisation + yields · EU refinery intake + 29 Mt/y diesel deficit · OPEC trade flows + freight · OPEC T76 cross-check (r ≈ 1.0 on overlap years) |
-| 3 | [Physical_Arb_Analysis](Physical_Arb_Analysis/) | Parametric `CargoArb` engine · 9-item P&L waterfall · 5 canonical lanes · 4 historical scenarios (2020 COVID / 2022 invasion / 2024 Red Sea / 2026 Hormuz) · reproduces a TD6 Suezmax stress fixture to the dollar |
+| 1 | [forward_curves_analysis](forward_curves_analysis/) | ICE Brent / LSGO / WTI M1–M12 daily settlements · CDF + HMM regime classification · regime-conditional rolling β · basin spread · 36-year OPEC ASB long-history context |
+| 2 | [spot_cracks_analysis](spot_cracks_analysis/) | NWE / Med 3-2-1, ULSD, EBOB cracks · US 43-year refinery utilisation + yields · EU refinery intake + 29 Mt/y diesel deficit · OPEC trade flows + freight · OPEC T76 cross-check (r ≈ 1.0 on overlap years) |
+| 3 | [physical_arb_analysis](physical_arb_analysis/) | Parametric `CargoArb` engine · 9-item P&L waterfall · 5 canonical lanes · 4 historical scenarios (2020 COVID / 2022 invasion / 2024 Red Sea / 2026 Hormuz) · reproduces a TD6 Suezmax stress fixture to the dollar |
 
 ---
 
 ## Layout
 
 ```
-Projects/
+projects/
 ├── README.md                     this file
 ├── PORTFOLIO_SUMMARY.md          cross-project synthesis
 ├── CRACK_METHODOLOGY.md          contract-month alignment, three Brent series
-├── CODING_STANDARDS.md           one-page SOP every sub-project follows
 ├── GLOSSARY.md                   term definitions (3-2-1, ULSD, IS/OOS, …)
 ├── plot_config.yaml              shared palette / fonts
 ├── major_dates.yaml              geopolitical + market event timeline
 ├── requirements-base.txt         shared minimum deps
 │
-├── Forward_Curves_Analysis/      Project 1
-├── Spot_Cracks_Analysis/         Project 2
-├── Physical_Arb_Analysis/        Project 3
-└── _chartbook/                   LaTeX chartbook + figures
+├── forward_curves_analysis/      Project 1, ICE forward curves + regime classifier
+├── spot_cracks_analysis/         Project 2, refining margins + EU diesel deficit
+├── physical_arb_analysis/        Project 3, parametric cargo arb engine
+├── chartbook/                    LaTeX chartbook + figures
+├── data/                         raw + cleaned inputs (Platts subfolder gitignored)
+└── reference_notes/              source PDFs (OPEC ASB, MOMR), not committed
 ```
 
-`Datas/` (raw + cleaned inputs) and `Reference_Notes/` (source PDFs — OPEC ASB, MOMR) are **not committed**. See *Data sourcing* below.
+`data/` (raw + cleaned inputs) and `reference_notes/` (source PDFs — OPEC ASB, MOMR) are **not committed**. See *Data sourcing* below.
 
 ---
 
@@ -73,13 +74,13 @@ pip install -r requirements.txt
 bash generate_reports.sh
 ```
 
-Each project reads `../Datas/` through its own `config.yaml`, inherits styling from `plot_config.yaml`, and pulls the event timeline from `major_dates.yaml`. A clean clone runs end-to-end once `Datas/` is populated per the conventions in each `config.yaml`.
+Each project reads `../data/` through its own `config.yaml`, inherits styling from `plot_config.yaml`, and pulls the event timeline from `major_dates.yaml`. A clean clone runs end-to-end once `data/` is populated per the conventions in each `config.yaml`.
 
 ---
 
 ## Data sourcing
 
-The `Datas/` folder is excluded from this repository to respect Platts and OPEC redistribution licensing — Platts daily price assessments and OPEC publications are not mine to redistribute. To reproduce locally you need:
+The `data/` folder is excluded from this repository to respect Platts and OPEC redistribution licensing — Platts daily price assessments and OPEC publications are not mine to redistribute. To reproduce locally you need:
 
 - **Forward curves**: ICE Brent / LSGO / WTI M1–M12 daily settlement strips (xlsx, one row per trade date, columns M1..M12).
 - **Platts physical**: spot ULSD / EBOB / Jet / FO prints (NWE, Med, ARA basis), merged into a `Spot_prices.xlsx`.
@@ -93,7 +94,7 @@ Per-project `config.yaml` files name expected paths and column conventions. Open
 
 ## Conventions
 
-Every project obeys the one-page SOP in [CODING_STANDARDS.md](CODING_STANDARDS.md): OOP engine + YAML config, IS/OOS split (training ≤ 2024-12-31, evaluation 2025+), CDF-calibrated regime thresholds, IS-anchored Z-scores, faceted time-series, unified palette, one-command reproducibility. Term definitions for non-specialists in [GLOSSARY.md](GLOSSARY.md). Notebook output cells are committed inplace so charts render on GitHub without execution (rule #26).
+Every project obeys a one-page SOP: OOP engine + YAML config, IS/OOS split (training ≤ 2024-12-31, evaluation 2025+), CDF-calibrated regime thresholds, IS-anchored Z-scores, faceted time-series, unified palette, one-command reproducibility. Term definitions for non-specialists in [GLOSSARY.md](GLOSSARY.md). Notebook output cells are committed inplace so charts render on GitHub without execution (rule #26).
 
 ---
 

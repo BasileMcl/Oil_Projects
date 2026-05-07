@@ -1,0 +1,150 @@
+PATHS:
+  DATA_ROOT: ../data               # relative to project root; resolved at runtime
+  FIGURES:   outputs/figures
+  REPORTS:   outputs/reports
+  MAJOR_DATES: ../major_dates.yaml
+
+ANALYSIS:
+  VOLATILITY_WINDOW:    20
+  ZSCORE_WINDOW:        60
+  ZSCORE_MODE:          is_anchored
+  ZSCORE_IS_END:        "2024-12-31"
+  ANNUAL_TRADING_DAYS:  252
+  HISTOGRAM_BINS:       50
+  RECENT_WINDOW_MONTHS: 18
+  ROLLING_CORR_WINDOW:  60
+  REGIME_QUANTILES:     {LOW_CRISIS: 0.01, LOW_STRESS: 0.05, HIGH_STRESS: 0.95, HIGH_CRISIS: 0.99}
+
+BBL_PER_MT:
+  ULSD: 7.45
+  EBOB: 8.33
+  FO:   6.35
+  JET:  7.88
+
+DATA:
+  SPOT_PRICES:      raw/Spot/Spot_prices.xlsx       # merged USD/MT products + USD/bbl crude
+  DATED_BRENT:      raw/Spot/Dated_Brent_DTD.xlsx
+  BRENT_FUTURES:    raw/Futures/Brent_M1M12.xlsx    # used for front-month Brent
+  US_STOCKS:        csv/us_stocks_clean.csv               # weekly EIA
+  US_REFINERY:      csv/us_refinery_util_clean.csv        # monthly EIA
+  EU_STOCKS:        csv/eu_stocks_clean.csv               # monthly Eurostat aggregate
+  EURUSD:           csv/eurusd_clean.csv                  # daily ECB
+  FLOATING_STORAGE: csv/floating_storage_clean.csv        # monthly Vortexa/Kpler
+  EUROPE_DIESEL_IMPORT_MONTHLY: csv/europe_diesel_import_monthly_clean.csv
+  EUROPE_DIESEL_IMPORT_5Y:      csv/europe_diesel_import_5y_clean.csv
+  RUSSIA_DIESEL_EXPORT_5Y:      csv/russia_diesel_export_5y_clean.csv
+  DIESEL_GLOBAL_EXPORT_5Y:      csv/diesel_global_export_5y_clean.csv
+  # Refining layer (EIA weekly/monthly + Eurostat supply-transformation)
+  US_REFINERY_WEEKLY:           raw/Refining/US_Refinery_Utilization_Weekly.csv   # 1982+ weekly
+  US_REFINERY_YIELDS:           raw/Refining/US_Refinery_Yields_Monthly.csv       # 1993+ monthly (17 product yields; HGL 2010+)
+  EU_REFINERY_INTAKE:           raw/Refining/EU_Supply_Transformation/EU_Refinery_intake_observed__AllCrudeFeedstocks.csv
+  EU_REFINERY_OUTPUT_DISTIL:    raw/Refining/EU_Supply_Transformation/EU_Refinery_output__Gasoil_Diesel.csv
+  EU_CONSUMPTION_DISTIL:        raw/Refining/EU_Supply_Transformation/EU_Gross_inland_deliveries__Gasoil_Diesel.csv   # apparent consumption
+  EU_CONSUMPTION_JET:           raw/Refining/EU_Supply_Transformation/EU_Gross_inland_deliveries__Jet.csv
+  EU_CONSUMPTION_PRODUCTS:      raw/Refining/EU_Supply_Transformation/EU_Gross_inland_deliveries__Products.csv
+  # OPEC ASB 2025 flattened tables
+  OPEC_T43_THROUGHPUT:          raw/OPEC/ASB_2025_tables_csv/T43_World_refinery_throughput_by_country_kbd.csv
+  OPEC_T52_CRUDE_EXPORTS:       raw/OPEC/ASB_2025_tables_csv/T52_World_crude_oil_exports_by_country_kbd.csv
+  OPEC_T53_PRODUCT_EXPORTS:     raw/OPEC/ASB_2025_tables_csv/T53_World_petroleum_product_exports_by_country_kbd.csv
+  OPEC_T62_FREIGHT_DIRTY:       raw/OPEC/ASB_2025_tables_csv/T62_Tanker_freight_Dirty_routes.csv
+  OPEC_T63_FREIGHT_CLEAN:       raw/OPEC/ASB_2025_tables_csv/T63_Tanker_freight_Clean_routes.csv
+  OPEC_T74_FUTURES_MONTHLY:     raw/OPEC/ASB_2025_tables_csv/T74_ICE_Brent_NYMEX_WTI_monthly_USD_bbl.csv
+  OPEC_T76_CRACKS:              raw/OPEC/ASB_2025_tables_csv/T76_Crack_spreads_major_markets_USD_bbl.csv
+
+CRACK_SLATES:
+  "3-2-1": {EBOB: 2, ULSD: 1, FO: 0, BRENT: 3}    # per 3 bbl crude
+  "2-1-1": {EBOB: 1, ULSD: 1, FO: 0, BRENT: 2}
+  "ULSD":  {EBOB: 0, ULSD: 1, FO: 0, BRENT: 1}
+  "EBOB":  {EBOB: 1, ULSD: 0, FO: 0, BRENT: 1}
+  "FO35":  {EBOB: 0, ULSD: 0, FO: 1, BRENT: 1}
+
+CRACK_PRODUCT_REGION:
+  # Which Platts spot series feeds each slate. Default NWE; alternative Med for ULSD.
+  NWE: {ULSD: ULSD_NWE_mt, EBOB: EBOB_mt, FO: FO_35_Rdam_mt}
+  MED: {ULSD: ULSD_Med_bbl, EBOB: EBOB_mt, FO: FO_35_Rdam_mt}   # Med only has ULSD natively; EBOB/FO stay NWE
+
+PLOT:
+  LINEWIDTH: 1.5
+  ALPHA:     {PRIMARY: 0.85, SECONDARY: 0.75, SCATTER: 0.45, REGIME: 0.7, REF: 0.6}
+  SIZES:     {STANDARD: [13, 7], WIDE: [14, 6], SQUARE: [10, 6], DASHBOARD: [15, 10]}
+  SAVE:      {dpi: 150, bbox_inches: tight, facecolor: white}
+  XAXIS:     {FORMAT: "%b %Y", MONTHS: 2}
+  RCPARAMS:
+    figure.facecolor:  white
+    axes.facecolor:    white
+    axes.grid:         true
+    grid.alpha:        0.3
+    grid.linestyle:    "-"
+    grid.linewidth:    0.5
+    axes.spines.top:   false
+    axes.spines.right: false
+    font.size:         10
+    axes.titlesize:    12
+    axes.titleweight:  bold
+  COLORS:
+    PRICE:    "#1f4e79"
+    VOL:      "#c00000"
+    CRACK:    "#e8601b"
+    MARGIN:   "#238b45"
+    STOCKS:   "#1f4e79"
+    SPR:      "#6a51a3"
+    FLOW:     "#2171b5"
+    FX:       "#6a51a3"
+    REF:      "#888888"
+    EVENT:    "#000000"
+    TREND:    "#c00000"
+    SCATTER:  "#1f4e79"
+    HIST:     "#e8601b"
+    # Traffic-light gradient: Normal=green, Tight=yellow, Stress=orange, Crisis=red.
+    # Both bare regime names and High/Low variants are mapped so charts render
+    # the right colour regardless of which classifier produced the labels.
+    REGIMES:  {Normal: "#2ca02c", Tight: "#f0c62e", Stress: "#ff7f0e", Crisis: "#c00000",
+               Unknown: "#aaaaaa",
+               Stress-High: "#ff7f0e", Stress-Low: "#ff7f0e",
+               Crisis-High: "#c00000", Crisis-Low: "#c00000"}
+    CYCLE:    ["#1f4e79", "#e8601b", "#238b45", "#c00000", "#6a51a3"]
+
+CHART_FILES:
+  # Cracks
+  CRACK_TIME_SERIES:       cracks/chart_01_time_series
+  CRACK_DISTRIBUTION:      cracks/chart_02_distribution
+  CRACK_COMPONENTS:        cracks/chart_03_components
+  CRACK_REGIME:            cracks/chart_04_regime
+  CRACK_MED_VS_NWE:        cracks/chart_05_med_vs_nwe
+  CRACK_ALL_SLATES:        cracks/chart_06_all_slates
+  CRACK_SEASONAL:          cracks/chart_07_seasonal
+  # Fundamentals
+  STOCKS_US:               fundamentals/chart_01_us_stocks
+  STOCKS_SPR:              fundamentals/chart_02_spr_drawdown
+  STOCKS_EU_VS_US:         fundamentals/chart_03_eu_vs_us_stocks
+  REFINERY_UTIL:           fundamentals/chart_04_refinery_util
+  FLOATING_STORAGE:        fundamentals/chart_05_floating_storage
+  STOCKS_CRACK_CORR:       fundamentals/chart_06_stocks_crack_correlation
+  STOCKS_EU_BY_COUNTRY:    fundamentals/chart_07_eu_stocks_by_country
+  # Refining additions (EIA long-history + EU supply transformation)
+  US_UTIL_LONG:            fundamentals/chart_08_us_util_long
+  US_YIELDS:               fundamentals/chart_09_us_yields
+  EU_REFINERY_INTAKE:      fundamentals/chart_10_eu_refinery_intake
+  EU_DISTIL_VS_CRACK:      fundamentals/chart_11_eu_distillate_vs_crack
+  EU_CONSUMPTION:          fundamentals/chart_12_eu_consumption_vs_output
+  EU_CONSUMPTION_ANNUAL:   fundamentals/chart_13_eu_consumption_annual
+  EU_JET_CONSUMPTION:      fundamentals/chart_14_eu_jet_consumption
+  BRENT_THREE_TRACKS:      cracks/chart_12_brent_three_tracks
+  CRACK_ROLL_HEDGE:        cracks/chart_09_rolling_hedge_ratio
+  CRACK_ROLL_HEDGE_REGIME: cracks/chart_09b_rolling_hedge_ratio_by_regime
+  CRACK_HMM_REGIME:        cracks/chart_10_hmm_regime
+  CRACK_SEASONAL_CI:       cracks/chart_11_seasonal_bootstrap_ci
+  # Regional
+  MED_NWE_INTEGRATION:     regional/chart_01_med_nwe_integration
+  BRENT_WTI_SPREAD:        regional/chart_02_brent_wti_spread
+  EURUSD_IMPACT:           regional/chart_03_eurusd_impact
+  RUSSIA_EXPORT:           regional/chart_04_russia_export
+  EUROPE_IMPORT_MIX:       regional/chart_05_europe_import_mix
+  DIESEL_GAS_PREMIUM:      regional/chart_06_diesel_gas_premium
+  # OPEC ASB additions (global trade flows + freight)
+  OPEC_TRADE_FLOWS:        regional/chart_07_opec_trade_flows
+  OPEC_TANKER_FREIGHT:     regional/chart_08_opec_tanker_freight
+  # Cracks cross-check (OPEC ASB T76)
+  CRACK_OPEC_CROSSCHECK:   cracks/chart_08_opec_crosscheck
+  # Executive
+  EXEC_DASHBOARD:          executive/chart_01_dashboard

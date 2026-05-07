@@ -1,9 +1,11 @@
-Datas/
-Reference_Notes/
-LinkedIn_Post/
+data/
+reference_notes/
 _archive/
-_chartbook/Oil_Portfolio_Chartbook_*_overleaf/
-_chartbook/Oil_Portfolio_Chartbook_*_overleaf.zip
+
+# chartbook/ ships only the final PDF; source stays local for rebuilds
+chartbook/*
+!chartbook/Oil_Portfolio_Chartbook_*.pdf
+
 **/outputs/figures/
 __pycache__/
 *.py[cod]
@@ -15,3 +17,4 @@ __pycache__/
 .idea/
 .claude/
 *.swp
+~$*

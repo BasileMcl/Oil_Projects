@@ -1,0 +1,92 @@
+PATHS:
+  FIGURES: outputs/figures
+  REPORTS: outputs/reports
+  MAJOR_DATES: ../major_dates.yaml            # portfolio-wide event timeline
+  NOTEBOOKS:
+    LSGO:         notebooks/02_lsgo.ipynb
+    BRENT:        notebooks/01_brent.ipynb
+    WTI:          notebooks/03_wti.ipynb
+    CROSS_MARKET: notebooks/04_cross_market.ipynb
+
+ANALYSIS:
+  DATE_FORMAT:          "%m/%d/%Y"
+  NUM_CONTRACT_MONTHS:  12
+  VOLATILITY_WINDOW:    20
+  ZSCORE_WINDOW:        60
+  ZSCORE_MODE:          "is_anchored"       # 'rolling' (legacy) | 'is_anchored' (μ,σ from IS window — removes rolling-std floor artifact)
+  ZSCORE_IS_END:        "2024-12-31"
+  ANNUAL_TRADING_DAYS:  252
+  HISTOGRAM_BINS:       50
+  EXTREME_RETURN_PCT:   5.0
+  ZSCORE_EXTREME:       3.0
+  ZSCORE_EXPECTED_PCT:  0.3
+  RECENT_WINDOW_MONTHS: 18                   # fallback for faceted bottom-panel "recent" view
+  RECENT_START_DATE:    "2026-01-01"         # if set, bottom panel zooms from this date — isolates the current-year crisis window
+
+# Per-commodity structure + calibration. Events are NOT duplicated here — they
+# live in ../major_dates.yaml and each commodity filters by its symbol in the
+# event's `affected:` list.
+COMMODITIES:
+  LSGO:
+    NAME:      LSGO
+    SYMBOL:    LSGO                           # used to filter events from major_dates.yaml
+    UNIT:      USD/MT
+    DATA_FILE: ../data/raw/Futures/LSGO_M1M12.xlsx
+    SUBDIR:    lsgo
+    DETECT_DUPLICATE_EXPIRY: false
+    PRE_ROLLED: true
+    REGIME_THRESHOLDS: {TIGHT: 3.6, STRESS: 6.71, CRISIS: 8.25}
+    SNAPSHOT_DATES:    ["2020-08-15", "2022-03-01", "2023-06-15", "2025-07-09", "2026-04-24"]
+  BRENT:
+    NAME:      Brent
+    SYMBOL:    Brent
+    UNIT:      USD/bbl
+    DATA_FILE: ../data/raw/Futures/Brent_M1M12.xlsx
+    DATED_FILE: ../data/raw/Spot/Dated_Brent_DTD.xlsx
+    SUBDIR:    brent
+    DETECT_DUPLICATE_EXPIRY: false
+    PRE_ROLLED: true
+    REGIME_THRESHOLDS: {TIGHT: 1.07, STRESS: 1.33, CRISIS: 1.51}
+    SNAPSHOT_DATES:    ["2020-04-20", "2022-03-08", "2023-06-15", "2025-06-19", "2026-04-24"]
+  WTI:
+    NAME:      WTI
+    SYMBOL:    WTI
+    UNIT:      USD/bbl
+    DATA_FILE: ../data/raw/Futures/WTI_M1M12.xlsx
+    SUBDIR:    wti
+    DETECT_DUPLICATE_EXPIRY: false
+    PRE_ROLLED: true
+    REGIME_THRESHOLDS: {TIGHT: 1.15, STRESS: 1.44, CRISIS: 1.61}
+    SNAPSHOT_DATES:    ["2020-04-20", "2022-03-08", "2023-06-15", "2025-06-19", "2026-04-24"]
+
+REGIME_CALIBRATION:
+  IN_SAMPLE_END: "2024-12-31"
+  QUANTILES:     {TIGHT: 0.80, STRESS: 0.95, CRISIS: 0.99}
+
+# PLOT block — inherited from ../plot_config.yaml (portfolio-wide).
+# Override here if a project needs a different palette. Empty = use shared.
+
+CHART_FILES:
+  PRICE_VOL:             chart_01_price_vol
+  FORWARD_CURVES:        chart_02_forward_curves
+  SHORT_STRUCTURE:       chart_03_short_structure
+  LONG_STRUCTURE:        chart_04_long_structure
+  ZSCORE_M1_M3:          chart_05_zscore_m1_m3
+  ZSCORE_M1_M6:          chart_06_zscore_m1_m6
+  DISTRIBUTION:          chart_07_distribution
+  EVENT_TIMELINE:        chart_09_event_timeline
+  DASHBOARD:             chart_10_dashboard
+  REGIME:                chart_11_regime                   # bimodal on this data — 2-state version planned
+  DATED_EVENT_STUDY:     chart_12_dated_event_study
+  HMM_REGIME:            chart_13_hmm_regime
+  FULL_STRIP:            chart_15_full_strip_m1m12
+  LONG_HISTORY_CONTEXT:  chart_14_opec_asb_long_history
+  CROSS_SCATTER:           cross_01_scatter
+  CROSS_ROLLING_CORR:      cross_02_rolling_corr
+  CROSS_LEAD_LAG:          cross_03_lead_lag
+  CROSS_ANNUAL_COUPLING:   cross_04_annual_coupling
+  CROSS_CRACK:             cross_05_crack_spread
+  CROSS_HEDGE_RATIO:       cross_06_hedge_ratio
+  CROSS_CORR_MATRIX:       cross_07_corr_matrix
+  CROSS_REGIME_COND_CORR:  cross_08_regime_conditional_corr
+  CROSS_BASIN_SPREAD:      cross_09_basin_spread

@@ -24,7 +24,7 @@ The four supports:
 
 ## Where the projects couple
 
-The most interesting cross-project finding is that **the regime flag from Project 1 conditions the crack hedge ratio in Project 2**. Not an assumption — something the code now actually does, in [Spot_Cracks_Analysis/src/crack_spread.py](Spot_Cracks_Analysis/src/crack_spread.py)'s `chart_rolling_hedge_ratio_by_regime`. Using the LSGO HMM regime from Project 1 as a conditioner, the rolling NWE ULSD-vs-Brent β runs at 0.608 in Crisis and 0.343 in Normal — a **1.78× ratio**. A paper-diesel book running a static β will be systematically over-hedged in calm and under-hedged in stress.
+The most interesting cross-project finding is that **the regime flag from Project 1 conditions the crack hedge ratio in Project 2**. Not an assumption — something the code now actually does, in [spot_cracks_analysis/src/crack_spread.py](spot_cracks_analysis/src/crack_spread.py)'s `chart_rolling_hedge_ratio_by_regime`. Using the LSGO HMM regime from Project 1 as a conditioner, the rolling NWE ULSD-vs-Brent β runs at 0.608 in Crisis and 0.343 in Normal — a **1.78× ratio**. A paper-diesel book running a static β will be systematically over-hedged in calm and under-hedged in stress.
 
 The second one is **physical-paper basis as the 2026 signature on both sides of the crude-product boundary**. In crude, Dated Brent − Jun-26 futures reached ≈$35 at peak on 2026-04-07. In products, Week-15 CIF Med ULSD sat at $1,402.50/mt vs. the EUM paper swap at $1,301.75/mt — a $13.52/bbl cash-over-paper basis on the same product, same region. Same phenomenon: the physical cargo is bid well over the tradeable paper contract because paper can't be short-sold fast enough to clear the squeeze. These are the cleanest setups of the cycle.
 

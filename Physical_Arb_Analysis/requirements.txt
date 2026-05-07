@@ -1,2 +1,0 @@
--r ../requirements-base.txt
-# Project 3 specific — no extras beyond base

@@ -38,7 +38,7 @@ Worked example for April 2026:
 
 ## Implementation
 
-[Forward_Curves_Analysis/src/futures_calendar.py](Forward_Curves_Analysis/src/futures_calendar.py) maps each trade date to its delivery-month pair. It is used by:
+[forward_curves_analysis/src/futures_calendar.py](forward_curves_analysis/src/futures_calendar.py) maps each trade date to its delivery-month pair. It is used by:
 
 - `CrackSpreadAnalysis` in Project 2 for the NWE and Med cracks.
 - `CrossMarketAnalysis` in Project 1 for the LSGO–Brent spread and rolling β.
@@ -50,9 +50,9 @@ The function returns `(brent_m, lsgo_m)` by date. Each module pulls the right co
 
 Three distinct Brent series used in this portfolio, labelled explicitly everywhere:
 
-- **Brent M1 futures** — ICE settlement, front-month contract. Tradeable paper. Source: `Datas/Raw_datas/Futures/Brent_M1M12.xlsx`.
-- **Brent spot** — Platts-assessed close, typically a blend of dated / prompt physical windows depending on assessment. Source: `Datas/Raw_datas/Spot/Spot_prices.xlsx` (column `Brent_bbl`).
-- **Dated Brent** — the physical cargo assessment Platts publishes at 16:30 London. This is the reference for physical trades. Source: `Datas/Raw_datas/Spot/Dated_Brent_DTD.xlsx` (69-day 2026 window; narrower history than the other two).
+- **Brent M1 futures** — ICE settlement, front-month contract. Tradeable paper. Source: `data/raw/Futures/Brent_M1M12.xlsx`.
+- **Brent spot** — Platts-assessed close, typically a blend of dated / prompt physical windows depending on assessment. Source: `data/raw/Spot/Spot_prices.xlsx` (column `Brent_bbl`).
+- **Dated Brent** — the physical cargo assessment Platts publishes at 16:30 London. This is the reference for physical trades. Source: `data/raw/Spot/Dated_Brent_DTD.xlsx` (69-day 2026 window; narrower history than the other two).
 
 The three can diverge by $10+/bbl under stress. The peak **Dated Brent − M1 futures** basis in the 2026-04 dislocation window reached ≈ $35/bbl — a real physical-paper dislocation, not a data artefact.
 
@@ -75,4 +75,4 @@ The chartbook PDF and the HTML reports are point-in-time snapshots. Charts regen
 
 ---
 
-*Added 2026-04-24 after the contract-month alignment audit. See `Forward_Curves_Analysis/src/futures_calendar.py` for the code.*
+*Added 2026-04-24 after the contract-month alignment audit. See `forward_curves_analysis/src/futures_calendar.py` for the code.*
