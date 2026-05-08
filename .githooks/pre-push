@@ -7,8 +7,8 @@
 
 set -uo pipefail
 
-remote="$1"
-url="$2"
+remote="${1:-origin}"
+url="${2:-$(git config --get remote.origin.url 2>/dev/null || echo unknown)}"
 
 # Read each ref the user is trying to push (one per line on stdin)
 fail=0
