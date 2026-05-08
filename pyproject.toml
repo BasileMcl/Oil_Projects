@@ -1,0 +1,43 @@
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+extend-include = ["*.ipynb"]
+extend-exclude = [
+    "data/",
+    "reference_notes/",
+    "_archive/",
+    "**/outputs/",
+    "chartbook/",
+    ".githooks/",
+]
+
+[tool.ruff.lint]
+select = [
+    "E",   # pycodestyle errors
+    "F",   # pyflakes
+    "I",   # isort
+    "B",   # flake8-bugbear
+    "UP",  # pyupgrade (modernize syntax)
+    "N",   # PEP8 naming
+    "SIM", # flake8-simplify
+]
+ignore = [
+    "E501",  # line too long, formatter handles
+    "N803",  # argument name lowercase, we use COMMODITY etc
+    "N806",  # variable in function should be lowercase, we mix conventions
+    "B008",  # function call in default arg, common in matplotlib defaults
+]
+
+[tool.ruff.lint.per-file-ignores]
+"**/*.ipynb" = [
+    "E402",  # module-level import not at top of file
+    "F401",  # imported but unused, common in nb scratch cells
+]
+"**/scripts/*.py" = [
+    "T201",  # print() allowed in scripts
+]
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+docstring-code-format = true
