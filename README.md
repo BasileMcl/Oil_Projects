@@ -2,7 +2,7 @@
 
 Three projects, one codebase. ICE forward curves, Platts cracks, physical cargo arbitrage — built around the 2025-2026 diesel / Hormuz cycle, fully reproducible from one command per project.
 
-Written by **Basile M'Couela** — EDHEC MSc Financial Engineering '27, currently Natixis CIB (XVA), ex-Haxem (Monaco physical clean products). Targeting a physical-trading-house placement starting summer 2027.
+Written by **Basile M'Couela** | EDHEC MSc Financial Engineering '27, currently Natixis CIB (XVA), ex-Haxem (Monaco physical clean products). Targeting a physical-trading-house placement starting summer 2027.
 
 **Snapshot: 2026-04-24.** Forward prices and Platts assessments dated to the Apr-24 Marketscan suite. Sanctions context reflects the EU 20th package (23-Apr-2026) and OFAC GL 134B (17-Apr-2026). Event timeline applied across all three projects in [major_dates.yaml](major_dates.yaml).
 
