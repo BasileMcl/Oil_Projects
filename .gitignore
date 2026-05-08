@@ -1,20 +1,86 @@
+# === Data, license-sensitive (never committable per Platts redistribution) ===
 data/
 reference_notes/
 _archive/
 
-# chartbook/ ships only the final PDF; source stays local for rebuilds
+# Defense in depth: tabular files anywhere, except whitelisted analytical outputs
+*.csv
+*.parquet
+*.xlsx
+*.xlsb
+*.feather
+*.h5
+*.hdf5
+*.tsv
+!**/outputs/reports/*.csv          # whitelist analytical results (matched_beta_*.csv etc.)
+!requirements*.txt
+
+# === Secrets, hard ban ===
+.env
+.env.*
+*.pem
+*.key
+*.cer
+credentials.json
+secrets.yaml
+secrets.yml
+config.local.yaml
+.aws/
+.kaggle/
+*token*
+*api_key*
+
+# === Claude Code, keep local (no public signal of Claude usage) ===
+.claude/
+CLAUDE.md
+CLAUDE.local.md
+claude.md
+
+# === chartbook ships only the final PDF; source stays local for rebuilds ===
 chartbook/*
 !chartbook/Oil_Portfolio_Chartbook_*.pdf
 
+# === regenerable outputs ===
 **/outputs/figures/
+**/outputs/reports/*.html
+**/outputs/**/*.tmp
+**/outputs/**/*.cache
+
+# === Python ===
 __pycache__/
 *.py[cod]
+*.pyo
 *.egg-info/
+dist/
+build/
+.venv/
+venv/
+env/
+.python-version
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# === Jupyter ===
 .ipynb_checkpoints/
 *.ipynb_checkpoints
+# Note: per CODING_STANDARDS rule #26, notebook outputs ARE committed.
+# Do NOT add *.ipynb here.
+
+# === LaTeX ===
+*.aux
+*.log
+*.out
+*.toc
+*.synctex.gz
+*.fls
+*.fdb_latexmk
+
+# === OS / IDE ===
 .DS_Store
+Thumbs.db
 .vscode/
 .idea/
-.claude/
 *.swp
+*.swo
 ~$*

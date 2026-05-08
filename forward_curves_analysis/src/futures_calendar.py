@@ -28,52 +28,48 @@ uses a Mon-Fri calendar with a configurable UK/US holiday list.
 """
 
 from __future__ import annotations
+
+from collections.abc import Iterable
 from dataclasses import dataclass
 from datetime import date, timedelta
-from typing import Iterable, Set
-import pandas as pd
 
+import pandas as pd
 
 # Minimal holiday set — New Year's Day, Good Friday, Easter Monday, May Day,
 # Christmas, Boxing Day. Extend via `holidays` param in `FuturesCalendar`
 # if you need tighter accuracy (LCH / ICE publish the definitive list).
 _DEFAULT_HOLIDAYS_FIXED = {
-    (1, 1),   # New Year
-    (5, 1),   # May Day
-    (12, 25), # Christmas
-    (12, 26), # Boxing Day
+    (1, 1),  # New Year
+    (5, 1),  # May Day
+    (12, 25),  # Christmas
+    (12, 26),  # Boxing Day
 }
 
 
-def _is_business_day(d: date, holidays: Set[date]) -> bool:
-    if d.weekday() >= 5:       # Sat / Sun
+def _is_business_day(d: date, holidays: set[date]) -> bool:
+    if d.weekday() >= 5:  # Sat / Sun
         return False
     if d in holidays:
         return False
-    if (d.month, d.day) in _DEFAULT_HOLIDAYS_FIXED:
-        return False
-    return True
+    return (d.month, d.day) not in _DEFAULT_HOLIDAYS_FIXED
 
 
-def _prev_business_day(d: date, holidays: Set[date]) -> date:
+def _prev_business_day(d: date, holidays: set[date]) -> date:
     d = d - timedelta(days=1)
     while not _is_business_day(d, holidays):
         d -= timedelta(days=1)
     return d
 
 
-def _last_business_day_of_month(y: int, m: int, holidays: Set[date]) -> date:
+def _last_business_day_of_month(y: int, m: int, holidays: set[date]) -> date:
     # start from last day of month, walk back
-    if m == 12:
-        d = date(y + 1, 1, 1) - timedelta(days=1)
-    else:
-        d = date(y, m + 1, 1) - timedelta(days=1)
+    d = date(y + 1, 1, 1) - timedelta(days=1) if m == 12 else date(y, m + 1, 1) - timedelta(days=1)
     while not _is_business_day(d, holidays):
         d -= timedelta(days=1)
     return d
 
 
-def _lsgo_expiry(y: int, m: int, holidays: Set[date]) -> date:
+def _lsgo_expiry(y: int, m: int, holidays: set[date]) -> date:
     """LSGO contract for delivery month (y, m) expires at 12:00 London
     2 business days before the 14th calendar day of month (y, m).
     We treat the expiry *as of* that full business day (close-of-day)
@@ -89,7 +85,7 @@ def _lsgo_expiry(y: int, m: int, holidays: Set[date]) -> date:
     return d
 
 
-def _brent_expiry(y: int, m: int, holidays: Set[date]) -> date:
+def _brent_expiry(y: int, m: int, holidays: set[date]) -> date:
     """Brent contract for delivery month (y, m) expires last BD of
     the second month preceding the delivery month. So Brent Jun-26
     expires last BD of April 2026.
@@ -106,6 +102,7 @@ def _brent_expiry(y: int, m: int, holidays: Set[date]) -> date:
 @dataclass
 class MonthPair:
     """Result of a pairing query for one trade date."""
+
     trade_date: date
     brent_m1_delivery: pd.Period
     lsgo_m1_delivery: pd.Period
@@ -137,7 +134,7 @@ class FuturesCalendar:
     """
 
     def __init__(self, holidays: Iterable[date] = ()):
-        self.holidays: Set[date] = set(holidays)
+        self.holidays: set[date] = set(holidays)
 
     # ----- public -----
     def brent_m1_delivery(self, d: date) -> pd.Period:
@@ -169,7 +166,7 @@ class FuturesCalendar:
         brent_m1 = self.brent_m1_delivery(d)
         lsgo_m1 = self.lsgo_m1_delivery(d)
         # The Brent M-number that matches LSGO M1's delivery month:
-        brent_match_m = (brent_m1.ordinal - lsgo_m1.ordinal) * -1 + 1
+        (brent_m1.ordinal - lsgo_m1.ordinal) * -1 + 1
         # more readably:
         #   lsgo_m1 - brent_m1  ==  (lsgo M1 delivery is N months before Brent M1 delivery)
         # usually lsgo M1 is before Brent M1 by 1 or 2 months (Brent is further-out),
@@ -196,22 +193,33 @@ class FuturesCalendar:
         rows = []
         for d in pd.DatetimeIndex(dates):
             p = self.pair_on(d.date())
-            rows.append({
-                "date": pd.Timestamp(d),
-                "brent_m1_delivery": p.brent_m1_delivery,
-                "lsgo_m1_delivery": p.lsgo_m1_delivery,
-                "lsgo_match_m": p.lsgo_match_m,
-                "brent_match_m": p.brent_match_m,
-                "label": p.label,
-            })
+            rows.append(
+                {
+                    "date": pd.Timestamp(d),
+                    "brent_m1_delivery": p.brent_m1_delivery,
+                    "lsgo_m1_delivery": p.lsgo_m1_delivery,
+                    "lsgo_match_m": p.lsgo_match_m,
+                    "brent_match_m": p.brent_match_m,
+                    "label": p.label,
+                }
+            )
         return pd.DataFrame(rows).set_index("date")
 
 
 # ----- quick self-test when run directly -----
 if __name__ == "__main__":
     cal = FuturesCalendar()
-    for d in ["2026-04-09", "2026-04-13", "2026-04-16", "2026-04-30",
-              "2026-05-05", "2026-05-13", "2026-05-29"]:
+    for d in [
+        "2026-04-09",
+        "2026-04-13",
+        "2026-04-16",
+        "2026-04-30",
+        "2026-05-05",
+        "2026-05-13",
+        "2026-05-29",
+    ]:
         p = cal.pair_on(d)
-        print(f"{d}: Brent M1 delivery {p.brent_m1_delivery} · "
-              f"LSGO M1 delivery {p.lsgo_m1_delivery} · pair → {p.label}")
+        print(
+            f"{d}: Brent M1 delivery {p.brent_m1_delivery} · "
+            f"LSGO M1 delivery {p.lsgo_m1_delivery} · pair → {p.label}"
+        )

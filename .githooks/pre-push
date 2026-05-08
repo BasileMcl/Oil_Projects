@@ -1,0 +1,119 @@
+#!/usr/bin/env bash
+# Pre-push audit. Refuses the push if anything sensitive is detected
+# in the commits being pushed. Designed for the Oil_Projects repo.
+#
+# To bypass in a true emergency, use: git push --no-verify
+# (do not normalize bypassing this — it exists for a reason).
+
+set -uo pipefail
+
+remote="$1"
+url="$2"
+
+# Read each ref the user is trying to push (one per line on stdin)
+fail=0
+header_printed=0
+
+print_header() {
+    if [ $header_printed -eq 0 ]; then
+        echo ""
+        echo "================================================================"
+        echo "  PRE-PUSH AUDIT, Oil_Projects"
+        echo "  remote: $remote ($url)"
+        echo "================================================================"
+        header_printed=1
+    fi
+}
+
+flag() {
+    print_header
+    echo ""
+    echo "  [BLOCK] $1"
+    fail=1
+}
+
+while read -r local_ref local_sha remote_ref remote_sha; do
+    # Skip deletions
+    [ "$local_sha" = "0000000000000000000000000000000000000000" ] && continue
+
+    # If new branch, scan all commits reachable but not on remote main
+    if [ "$remote_sha" = "0000000000000000000000000000000000000000" ]; then
+        range="origin/main..$local_sha"
+    else
+        range="$remote_sha..$local_sha"
+    fi
+
+    # List files added or modified in this push range
+    files=$(git diff --name-only --diff-filter=AM "$range" 2>/dev/null)
+    [ -z "$files" ] && continue
+
+    print_header
+    echo ""
+    echo "  Push range: $range"
+    echo "  Files changed: $(echo "$files" | wc -l | tr -d ' ')"
+
+    # ---- Check 1: secrets-by-filename ----
+    secrets=$(echo "$files" | grep -iE '(^|/)(\.env|credentials\.json|secrets\.ya?ml|.*\.pem|.*\.key|.*\.cer)$|token|api_key' || true)
+    [ -n "$secrets" ] && flag "secret-suspicious filenames in this push:" && echo "$secrets" | sed 's/^/      /'
+
+    # ---- Check 2: data folders ----
+    data=$(echo "$files" | grep -E '^(data/|reference_notes/|_archive/|haxem/)' || true)
+    [ -n "$data" ] && flag "data folders should not be tracked:" && echo "$data" | sed 's/^/      /'
+
+    # ---- Check 3: Platts-code filenames ----
+    platts=$(echo "$files" | grep -iE 'platts|pgw|aagxk|aaykp|aamco|paaap|pcaad|pcaas|aali_' || true)
+    [ -n "$platts" ] && flag "Platts-code filename detected:" && echo "$platts" | sed 's/^/      /'
+
+    # ---- Check 4: tabular data outside whitelisted outputs ----
+    tabular=$(echo "$files" | grep -iE '\.(csv|parquet|xlsx|xlsb|feather|h5|hdf5|tsv)$' | grep -vE '^.*outputs/reports/' || true)
+    [ -n "$tabular" ] && flag "tabular file outside whitelisted outputs/reports/:" && echo "$tabular" | sed 's/^/      /'
+
+    # ---- Check 5: in-content secret patterns (lightweight regex on the diff) ----
+    diff_content=$(git diff "$range" -- 2>/dev/null | grep -E '^\+' || true)
+    if [ -n "$diff_content" ]; then
+        leaked=""
+        # OpenAI / Anthropic / generic
+        echo "$diff_content" | grep -iqE 'sk-[a-z0-9]{20,}|sk-ant-[a-z0-9]{20,}' && leaked+=$'    OpenAI/Anthropic-style API key pattern\n'
+        # AWS
+        echo "$diff_content" | grep -qE '(AKIA|ASIA)[A-Z0-9]{16}' && leaked+=$'    AWS access key id pattern\n'
+        # Generic high-entropy "secret = ..." lines
+        echo "$diff_content" | grep -iE '(api[_-]?key|secret|token|password)\s*[:=]\s*["'\'']?[A-Za-z0-9_\-]{20,}' | grep -vE '\.template|example|placeholder|REDACTED' | head -3 | grep -q . && leaked+=$'    high-entropy secret-like assignment\n'
+        # Private key headers
+        echo "$diff_content" | grep -qE 'BEGIN (RSA |EC |DSA |OPENSSH |)PRIVATE KEY' && leaked+=$'    private key block\n'
+        if [ -n "$leaked" ]; then
+            flag "secret patterns inside the diff content:"
+            printf "%s" "$leaked" | sed 's/^/  /'
+        fi
+    fi
+
+    # ---- Check 6: huge files (>5 MB) ----
+    while IFS= read -r f; do
+        [ -z "$f" ] && continue
+        if git cat-file -e "$local_sha:$f" 2>/dev/null; then
+            sz=$(git cat-file -s "$local_sha:$f" 2>/dev/null || echo 0)
+            if [ "$sz" -gt 5242880 ]; then
+                flag "large file (>5 MB), likely shouldn't be tracked: $f ($((sz/1024/1024)) MB)"
+            fi
+        fi
+    done <<< "$files"
+
+done
+
+if [ $fail -eq 1 ]; then
+    print_header
+    echo ""
+    echo "  PUSH BLOCKED. Address the items above, or, if you are SURE this is"
+    echo "  intentional, bypass with:  git push --no-verify"
+    echo "================================================================"
+    echo ""
+    exit 1
+fi
+
+# Quiet success unless there were warnings worth showing
+if [ $header_printed -eq 1 ]; then
+    echo ""
+    echo "  audit clean. push proceeding."
+    echo "================================================================"
+    echo ""
+fi
+exit 0

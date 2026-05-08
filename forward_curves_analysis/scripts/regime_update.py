@@ -17,6 +17,7 @@ Behavior:
 Dependencies: pandas only. Requires `outputs/reports/matched_beta_series.csv`
 to exist (regenerate via `scripts/run_matched_beta.py` if stale).
 """
+
 from __future__ import annotations
 
 import argparse
@@ -42,10 +43,16 @@ EU_DEFICIT_BASELINE_MT = 29
 
 def parse_args():
     p = argparse.ArgumentParser()
-    p.add_argument("--as_of", default=date.today().isoformat(),
-                   help="Date for the header (default: today, ISO format)")
-    p.add_argument("--no-append", action="store_true",
-                   help="Compute and print only; do not append to regimes.md")
+    p.add_argument(
+        "--as_of",
+        default=date.today().isoformat(),
+        help="Date for the header (default: today, ISO format)",
+    )
+    p.add_argument(
+        "--no-append",
+        action="store_true",
+        help="Compute and print only; do not append to regimes.md",
+    )
     return p.parse_args()
 
 
@@ -55,9 +62,7 @@ def days_since_anchor(today: date) -> int:
 
 def beta_stats() -> dict:
     if not BETA_CSV.exists():
-        raise FileNotFoundError(
-            f"{BETA_CSV} not found. Re-run scripts/run_matched_beta.py first."
-        )
+        raise FileNotFoundError(f"{BETA_CSV} not found. Re-run scripts/run_matched_beta.py first.")
     df = pd.read_csv(BETA_CSV, parse_dates=["Date"])
     df = df.dropna(subset=["beta"]).sort_values("Date")
     if df.empty:
@@ -94,22 +99,26 @@ def read_last_log_entry() -> dict | None:
             d = datetime.fromisoformat(cells[0]).date()
         except ValueError:
             continue
-        rows.append({
-            "date": d,
-            "regime": cells[1],
-            "days_since": int(cells[2]),
-            "beta_30d": float(cells[3]),
-            "beta_60d": float(cells[4]),
-            "beta_latest": float(cells[5]),
-            "eu_baseline": cells[6] if len(cells) > 6 else "",
-        })
+        rows.append(
+            {
+                "date": d,
+                "regime": cells[1],
+                "days_since": int(cells[2]),
+                "beta_30d": float(cells[3]),
+                "beta_60d": float(cells[4]),
+                "beta_latest": float(cells[5]),
+                "eu_baseline": cells[6] if len(cells) > 6 else "",
+            }
+        )
     if not rows:
         return None
     rows.sort(key=lambda r: r["date"])
     return rows[-1]
 
 
-def append_log_row(today: date, regime: str, days: int, b30: float, b60: float, blatest: float, eu_baseline: int) -> None:
+def append_log_row(
+    today: date, regime: str, days: int, b30: float, b60: float, blatest: float, eu_baseline: int
+) -> None:
     """Append today's row to regimes.md. Create the file with a header if it does not yet exist."""
     REGIMES_LOG.parent.mkdir(parents=True, exist_ok=True)
     header = (
@@ -169,9 +178,13 @@ def main():
         if prev["regime"] == REGIME_LABEL:
             regime_delta = f"same regime, {delta_days_text}"
         else:
-            regime_delta = f"REGIME SHIFT from {prev['regime']} to {REGIME_LABEL}, {delta_days_text}"
+            regime_delta = (
+                f"REGIME SHIFT from {prev['regime']} to {REGIME_LABEL}, {delta_days_text}"
+            )
         d_beta_30d = bs["mean_30d"] - prev["beta_30d"]
-        beta_delta_text = f"Δ {d_beta_30d:+.2f} vs entry on {prev_date.isoformat()} ({prev['beta_30d']:+.2f})"
+        beta_delta_text = (
+            f"Δ {d_beta_30d:+.2f} vs entry on {prev_date.isoformat()} ({prev['beta_30d']:+.2f})"
+        )
     else:
         regime_delta = "first logged entry, no prior comparison"
         beta_delta_text = "no prior entry"
